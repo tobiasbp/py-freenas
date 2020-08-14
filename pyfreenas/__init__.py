@@ -30,11 +30,12 @@ class Machine(object):
         await m.connect(host=host, password=password, username=username)
         return m
 
-    async def connect(self, host: str, password: str, username: str) -> None:
+    async def connect(self, host: str, password: str, username: str, secure: bool = True) -> None:
         """Connects to the remote machine."""
         assert self._client is None
+        protocol = 'wss' if secure else 'ws'
         self._client = await websockets.connect(
-            f"ws://{host}/websocket",
+            f"{protocol}://{host}/websocket",
             create_protocol=freenas_auth_protocol_factory(username, password),
         )
         self._info = await self._client.invoke_method("system.info")
